@@ -31,12 +31,12 @@ bENCHMRK3242! trying to reach when using the "cd" command. e.g. "cd $HOME" is th
 + "cat /proc/cpuinfo" will display the info of the cpu.
 + typing "ls -al" will give you a detailed of all files in the directory
 
-## Motor 
+## DC Motors 
 
-The first picture [Single Core Motor]()
+The first picture [Single Core Motor](https://photos.app.goo.gl/jvgf7CXRFyz7kxy13)
 
 
-### Single Core 
+### Single Coil 
 + AIM:
 
 - To know the key parts of a DC motor
@@ -44,7 +44,7 @@ The first picture [Single Core Motor]()
 
 
 + Parts for the motor:
-[Parts of the Motor]()
+[Parts of the Motor](https://photos.app.goo.gl/zTotbrEkya7QLOCD3)
 - a cork
 - copper tape
 - a nail
@@ -54,7 +54,7 @@ The first picture [Single Core Motor]()
 - copper coil
 
 
-+ procedure:
++ Procedure:
 - insert the nail through both ends of the cork
 - Commutator - stick 2 peices of copper tape on one end of the cork (make sure they don't touch)
 - Armature - wind the wire around the cork and make sure both the ends are free
@@ -63,29 +63,333 @@ The first picture [Single Core Motor]()
 - apply power to the commutator using wires by using the ends of the wires like brushes
 
 #### Performance
-[Single-Coil motor functioning](https://photos.app.goo.gl/Io6Bs9HTLziDie9f1)
+[Single-Coil motor functioning](https://photos.app.goo.gl/a2n7oXHKw7K7IIfQ2)
+
+The single-coil motor functioned reliably and to a fairly high standard.
+The coil was made using copper wire wound 100 times making contact with the commutator.
 
 
-#DC MOTOR with 4 coils:
+### 4 Coil:
 
-+ Aim:
-- to make a 4 coil DC motor
++ Procedure:
 
-+ procedure:
-- 3d design the armature and print it.
-- 3d print the magnetic holders and print it.
-- wind 4 different coild around the armature.
-- use the copper tape on the armature to make the commutator.
+- Use Fusion 360 to design the armature and 3D print.
+- Use FUsion 360 to design the magnet holders and print them.
+- Wind 4 different coils around the armature 100 times each.
+- Use four strips of copper tape to make the commutator.
 - solder the ends of the wire to the copper tape.
-- assemble all the parts.
-- apply power to the commutator with copper wires
+- apply power to the commutator with copper wires.
 
-
-+ Result
-- a 4 coil DC motor
 
 #### Performance
+[Four-Coil motor](https://photos.app.goo.gl/bK6Jy49uV1eum0AI2)
 
-The functionality of our single core motor (made from cork) is on a whole 1
+The functionality of our four core motor was unreliable at best. Only slightly rotating on occasion.
+Upon reinserting the single coil armature into the same setup as the four coil, it became apparent that the motor's speed had reduced along with its reliability. 
+By moving themagnet holders closer to the single coil motor, we were able to restore its functionality. 
+The design of the armature was too wide. This meant that the magnets were not close enough to one another to gnerate a sufficent magnetic field to cause the motor to spin consistently.
+
++ Improvements: 
+	There are many things that could have been done to improve our final four coil design
+- the armature's design would have been more effect if the slots to wrap the coils around were slanted so as to further improve the speed of rotation of the motor.
+- had we implemented the use of a metallic core (instead of a wooden one) the magneic field generated would have been stronger, increasing the effectiveness of the motor.
+- redesigning the chasis: decreasing the size of the armature would have allowed us to move the magnets closer together and increasae the strength of the magnetic field, providing a more consistent rotation from the motor, hence allowing the calculation of rps and frequency.
+___________________________________________
+## Stepper Motors - partnered with IJaas
+___________________________________________
++ Aim:
+ - to understand what a stepper motor is
+ - to be able to program a stepper motor using an arduino
+
++ Outline:
+ - Stepper motors are synchronous electric motors.
+ - By alternating which coils and wires the current flows through, a rotating magnetic field is generated, which in turn, turns the motor.
+
+[Basic Stepper motor Video](https://photos.app.goo.gl/rzxW0PJFWqcTdBdG3)
+[Improved Stepper Motor Video](https://photos.app.goo.gl/swYa62tRhpB8bzfo2)
+
++ Arduino code:
+define DIR_A 12
+define PWM_A 3
+define DIR_B 13
+define PWM_B 11
+
+const int delayMs = 400;
+
+void setup() {
+pinMode(DIR_A, OUTPUT);
+pinMode(DIR_B, OUTPUT);
+pinMode(9, OUTPUT); digitalWrite(8, LOW); //No braking ch. A
+pinMode(8, OUTPUT); digitalWrite(8, LOW); //No braking ch. B
+}
+
+void loop() {
+  //full_step();
+  //two_phase();
+  half_step();
+}
+
+void full_step()
+{
+
+ digitalWrite(DIR_A, HIGH); // Ch. A forward
+ digitalWrite(DIR_B, HIGH); // Ch. B forward
+ analogWrite(PWM_A, 255); // Ch. A on
+ analogWrite(PWM_B, 0); // Ch. B off
+ delay(delayMs);
+ 
+ analogWrite(PWM_A, 0); // Ch. A off
+ analogWrite(PWM_B, 255); // Ch. B on
+ delay(delayMs);
+ 
+ digitalWrite(DIR_A, LOW); // Ch. A backwards
+ digitalWrite(DIR_B, LOW); // Ch. B backwards
+ analogWrite(PWM_A, 255); // Ch. A on
+ analogWrite(PWM_B, 0); // Ch. B off
+ delay(delayMs);
+ 
+ analogWrite(PWM_A, 0); // Ch. A off
+ analogWrite(PWM_B, 255); // Ch. B on
+ delay(delayMs);
+  
+}
+
+
+void two_phase()
+{
+   digitalWrite(DIR_A, HIGH); // Ch. A forward
+ digitalWrite(DIR_B, HIGH); // Ch. B forward
+ analogWrite(PWM_A, 255); // Ch. A on
+ analogWrite(PWM_B, 255); // Ch. B off
+delayMicroseconds(delayMs);
+ 
+ digitalWrite(DIR_A, LOW);
+ analogWrite(PWM_A, 255); // Ch. A off
+ analogWrite(PWM_B, 255); // Ch. B on
+ delayMicroseconds(delayMs);
+ 
+ //digitalWrite(DIR_A, LOW); // Ch. A backwards
+ digitalWrite(DIR_B, LOW); // Ch. B backwards
+ analogWrite(PWM_A, 255); // Ch. A on
+ analogWrite(PWM_B, 255); // Ch. B off
+ delayMicroseconds(delayMs);
+ 
+  digitalWrite(DIR_A, HIGH);
+   //digitalWrite(DIR_B, HIGH);
+ analogWrite(PWM_A, 255); // Ch. A off
+ analogWrite(PWM_B, 255); // Ch. B on
+ delayMicroseconds(delayMs);
+}
+
+void half_step()
+{
+ digitalWrite(DIR_A, HIGH); // Ch. A forward
+ digitalWrite(DIR_B, HIGH); // Ch. B forward
+ analogWrite(PWM_A, 255); // Ch. A on
+ analogWrite(PWM_B, 0); // Ch. B off
+delayMicroseconds(delayMs);
+ 
+//digitalWrite(DIR_A, HIGH); // Ch. A forward
+//digitalWrite(DIR_B, HIGH); // Ch. B forward
+analogWrite(PWM_A, 255); // Ch. A off
+analogWrite(PWM_B, 255); // Ch. B on
+delayMicroseconds(delayMs);
+ 
+ //digitalWrite(DIR_A, LOW); // Ch. A backwards
+// digitalWrite(DIR_A, LOW); // Ch. B backwards
+ analogWrite(PWM_A, 0); // Ch. A on
+ analogWrite(PWM_B, 255); // Ch. B off
+ delayMicroseconds(delayMs);
+ 
+  digitalWrite(DIR_A, LOW);
+   //digitalWrite(DIR_B, HIGH);
+ analogWrite(PWM_A, 255); // Ch. A off
+ analogWrite(PWM_B, 255); // Ch. B on
+ delayMicroseconds(delayMs);
+ 
+ 
+    //digitalWrite(DIR_B, HIGH);
+ analogWrite(PWM_A, 255); // Ch. A off
+ analogWrite(PWM_B, 0); // Ch. B on
+ delayMicroseconds(delayMs);
+ 
+ 
+// digitalWrite(DIR_A,LOW); // Ch. A forward
+ digitalWrite(DIR_B, LOW); // Ch. B forward
+ analogWrite(PWM_A, 255); // Ch. A off
+ analogWrite(PWM_B, 255); // Ch. B on
+ delayMicroseconds(delayMs);
+ 
+ 
+//  digitalWrite(DIR_A,LOW); // Ch. A forward
+ //digitalWrite(DIR_B, LOW); // Ch. B forward
+ analogWrite(PWM_A, 0); // Ch. A off
+ analogWrite(PWM_B, 255); // Ch. B on
+ delayMicroseconds(delayMs);
+ 
+  digitalWrite(DIR_A,HIGH); // Ch. A forward
+ //digitalWrite(DIR_B, LOW); // Ch. B forward
+ analogWrite(PWM_A, 255); // Ch. A off
+ analogWrite(PWM_B, 255); // Ch. B on
+ delayMicroseconds(delayMs);
+}
+
+
+## Robot Arm:
+
+### Step 1 : URDF:
+<?xml version="1.0"?>
+<robot name="roco_arm">
+
+  <material name="blue">
+   <color rgba="0 0 0.8 1"/>
+  </material>
+
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+
+  <material name="green">
+    <color rgba="0 0.8 0 1"/>
+  </material>
+
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+      <cylinder length="0.05" radius="0.08"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+  </link>
+
+
+  <link name="first_segment">
+    <visual>
+      <geometry>
+      <box size="0.1 0.1 0.1"/>
+      </geometry>
+      <material name="blue"/>
+    <origin rpy="0 0 0" xyz="0 0 0" />
+    </visual>
+  </link>
+
+
+
+   <link name="second_segment">
+    <visual>
+      <geometry>
+      <box size="0.15 0.02 0.03"/>
+      </geometry>
+     <origin rpy="0 0 0" xyz="-0.09 0 0" />
+    </visual>
+  </link>
+
+
+
+  <link name="third_segment">
+    <visual>
+      <geometry>
+      <box size="0.10 0.02 0.03"/>
+      </geometry>
+      <material name="green"/>
+     <origin rpy="0 0 0" xyz="-0.065 0 0" />
+    </visual>
+  </link>
+
+ 
+
+  
+
+  <joint name="base_to_first" type="revolute">
+    <axis xyz="0 0 -1" />
+    <limit effort="1000" lower="0" upper="3.14" velocity="0.5" />
+    <parent link="base_link"/>
+    <child link="first_segment"/>
+    <origin xyz="0 0 0.03" />
+  </joint>
+
+ 
+ <joint name="first_to_second" type="revolute">
+    <axis xyz="0 1 0" />
+    <limit effort="1000" lower="0" upper="3.14" velocity="0.5" />
+    <parent link="first_segment"/>
+    <child link="second_segment"/>
+    <origin xyz="0 0 0.035" />
+    
+  </joint>
+
+ 
+
+
+
+  <joint name="second_to_third" type="revolute">
+    <axis xyz="0 1 0" />
+    <limit effort="1000" lower="-1.5" upper="1.5" velocity="0.5" />
+    <parent link="second_segment"/>
+    <child link="third_segment"/>
+   <origin xyz="-0.15 0 0" />
+  </joint>
+
+
+</robot>
+
+### Step 2: Arduino Code:
+include <Servo.h>
+include <ros.h>
+include <sensor_msgs/JointState.h>
+
+using namespace ros;
+
+NodeHandle nh;
+Servo servo0;
+Servo servo1;
+Servo servo2;
+
+void cb( const sensor_msgs::JointState& msg){
+int angle0 = (int) (msg.position[0] * 180/3.14);
+int angle1 = (int) (msg.position[1] * 180/3.14);
+int angle2 = (int) (msg.position[2] * 180/3.14);
+servo0.write(angle0); // 0-180
+servo1.write(angle1); // 0-180
+servo2.write(angle2); // 0-180
+}
+
+
+
+Subscriber<sensor_msgs::JointState>
+sub("joint_states", cb);
+
+void setup(){
+nh.initNode();
+nh.subscribe(sub);
+
+servo0.attach(9); //attach it to pin 9
+servo1.attach(10);
+servo2.attach(11);
+}
+
+void loop(){
+nh.spinOnce();
+delay(1);
+}
+
+### Step 3: RVIZ:
+
+[RVIZ simulation](https://photos.app.goo.gl/m384chBEFksHYJGk1)
+
+### Step 4: Final Product:
+[Arm FInished](https://photos.app.goo.gl/N2K8QtcsK3VqRQyu2)
+
++ Improvements:
+ - our original intention was to add a fourth degree of movement controlling a claw at the end of the arm, however due to the glue not holding on the screw (weakening the movement of the other parts) this was not possible as the weight would have caused the arm to topple. 
+- the glue used was not very effective, so tape had to be used which did not look as aesthetically pleasing as originally planned.
+
+
+
+
+
+
+
 
 
